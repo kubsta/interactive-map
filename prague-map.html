@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prague Game Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Initialize the map
+    var map = L.map('map').setView([50.0755, 14.4378], 13);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Fetch data from published Google Sheet
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRqkeip4KMVqUWWZT1tbCZxEVzT7aiJFE7e8l8C4wfdODHj1sh8Tf-QtuSRilEtGaO8g0I5IUyJsx8j/pub?output=csv';
+
+    fetch(sheetURL)
+      .then(response => response.text())
+      .then(csvText => {
+        const rows = csvText.split('\n').slice(1); // skip header row
+        rows.forEach(row => {
+          const columns = row.split(',');
+          const name = columns[0];
+          const lat = parseFloat(columns[1]);
+          const lng = parseFloat(columns[2]);
+          const symbol = columns[3] || '🎲';
+          const startTime = columns[4];
+
+          if (!isNaN(lat) && !isNaN(lng)) {
+            const icon = L.divIcon({
+              html: `<div style="font-size: 2rem;">${symbol}</div>`,
+              className: ''
+            });
+
+            L.marker([lat, lng], { icon: icon })
+              .addTo(map)
+              .bindPopup(`<b>${name}</b><br>Starts at ${startTime}`);
+          }
+        });
+      })
+      .catch(err => console.error('Error loading sheet data', err));
+  </script>
+</body>
+</html>
