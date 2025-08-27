@@ -39,6 +39,7 @@
           const lng = parseFloat(columns[2]);
           const symbol = columns[3] || '🎲';
           const startTime = columns[4];
+          const NumPeople = columns [5];
 
           if (!isNaN(lat) && !isNaN(lng)) {
             const icon = L.divIcon({
@@ -48,7 +49,7 @@
 
             L.marker([lat, lng], { icon: icon })
               .addTo(map)
-              .bindPopup(`<b>${name}</b><br>Rozpoczyna w ${startTime}`);
+              .bindPopup(`<b>${name}</b><br>Rozpoczyna w ${startTime}<br> Liczba graczy ${NumPeople};
           }
         });
       })
@@ -56,6 +57,7 @@
   </script>
 </body>
 </html>
+
 
 
 
